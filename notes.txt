@@ -1,0 +1,4 @@
+# extract log file from container
+docker cp 2659d8352146:/app/logs/log2020040923.log C:/logs/target.log
+
+docker cp 2659d8352146:/app/logs/ c:/logs/
