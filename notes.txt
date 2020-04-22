@@ -1,4 +1,20 @@
 # extract log file from container
 docker cp 2659d8352146:/app/logs/log2020040923.log C:/logs/target.log
 
-docker cp 2659d8352146:/app/logs/ c:/logs/
+docker exec -it owlvey_docker_api_1 bash
+
+docker stop owlvey_docker_api_1
+
+docker start owlvey_docker_api_1
+
+dotnet trace collect --process-id 1
+
+docker cp owlvey_docker_api_1:/app/logs/ c:/logs/
+docker cp owlvey_docker_api_1:/app/trace.nettrace c:/logs/trace.nettrace
+
+dotnet trace convert trace.nettrace --format speedscope
+
+docker cp owlvey_docker_api_1:/app/trace.speedscope.json c:/logs/trace.speedscope.json
+docker cp owlvey_docker_api_1:/app/trace.nettrace c:/logs/trace.nettrace
+
+

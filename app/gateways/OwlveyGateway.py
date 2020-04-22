@@ -1,5 +1,9 @@
 import datetime
+import pathlib
+
 import requests
+import shutil
+from os import path
 
 from app.components.ConfigurationComponent import ConfigurationComponent
 
@@ -36,8 +40,23 @@ class OwlveyGateway:
         }
 
     def get_organizations(self):
-        self.client.get('/customers',
-                        headers=self.__build_authorization_header())
+        return self.get('/customers')
+
+    def get_organization(self, organization_id):
+        return self.get('/customers/{}'.format(organization_id))
+
+    def get_products(self, organization_id):
+        return self.get('/products?customerId={}'.format(organization_id))
+
+    def get_product(self, product_id):
+        return self.get('/products/{}'.format(product_id))
+
+    def get(self, url):
+        response = self.client.get(url, verify=False,
+                                   headers=self.__build_authorization_header())
+        if response.status_code > 299:
+            raise ValueError(url + " \n " + response.text)
+        return response.json()
 
     def __internal_post(self, url, payload):
         response = self.client.post(url,
@@ -89,3 +108,21 @@ class OwlveyGateway:
                                         "total": total,
                                         "good": good
                                     })
+
+    def get_backup(self, filename):
+        with self.client.get('/migrations/backup/data', verify=False,
+                             headers=self.__build_authorization_header(), stream=True) as response:
+            path_target = path.join("./../backups", filename)
+            if response.status_code > 299:
+                raise ValueError(str(response.status_code) + " :  " + response.text)
+            with open(path_target, 'wb') as f:
+                shutil.copyfileobj(response.raw, f)
+
+    def post_restore(self, filename):
+        path_target = path.join(pathlib.Path(__file__).parent.parent.parent.absolute(), "backups", filename)
+        print(path_target)
+        files = {'data': open(path_target, 'rb')}
+        with self.client.post('/migrations/restore', files=files,
+                              headers=self.__build_authorization_header(), verify=False) as response:
+            if response.status_code > 299:
+                raise ValueError(str(response.status_code) + " :  " + response.text)
