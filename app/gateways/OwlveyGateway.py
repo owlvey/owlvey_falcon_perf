@@ -40,13 +40,13 @@ class OwlveyGateway:
         }
 
     def get_organizations(self):
-        return self.get('/customers')
+        return self.get('/customers/lite')
 
     def get_organization(self, organization_id):
         return self.get('/customers/{}'.format(organization_id))
 
     def get_products(self, organization_id):
-        return self.get('/products?customerId={}'.format(organization_id))
+        return self.get('/products/lite?customerId={}'.format(organization_id))
 
     def get_product(self, product_id):
         return self.get('/products/{}'.format(product_id))

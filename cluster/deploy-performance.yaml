@@ -1,0 +1,47 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:    
+    tier: performance
+  name: owlvey-performance-deployment
+  namespace: owlvey
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      key: owlvey-performance-pod
+  template:
+    metadata:
+      labels:
+        key: owlvey-performance-pod
+    spec:
+      containers:
+        - name: owlvey-performance
+          image: localhost:48700/registry/performance:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8089
+          env:
+            - name: "LOCUST_LOCUSTFILE"
+              value: "/app/performance/test_A001_load.py"
+            - name: "OWLVEY_IDENTITY"
+              value: "http://service-identity:48100/"            
+            - name: "OWLVEY_API"
+              value: "http://service-api:48100/"
+            - name: "OWLVEY_CLIENT_API"
+              value: "CF4A9ED44148438A99919FF285D8B48D"
+            - name: "OWLVEY_CLIENT_SECRET"
+              value: "0da45603-282a-4fa6-a20b-2d4c3f2a2127"        
+            - name: "LOCUST_HOST"
+              value: "http://service-api:48100"        
+            - name: "LOCUST_USERS"
+              value: "10"        
+            - name: "LOCUST_HATCH_RATE"
+              value: "5"                 
+            
+              
+              
+
+        
+        
+      

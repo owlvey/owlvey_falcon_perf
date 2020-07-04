@@ -1,4 +1,4 @@
-from locust import TaskSet, task, HttpLocust, between, TaskSequence, seq_task
+from locust import TaskSet, task, HttpUser, between, tag
 from app.components.ConfigurationComponent import ConfigurationComponent
 from app.components.OwlveyComponent import OwlveyComponent
 from specs.LiveServerSession import LiveServerSession
@@ -9,7 +9,8 @@ Stress because we will test different interactions
 '''
 
 
-class UserBehavior(TaskSet):
+class WebsiteUser(HttpUser):
+    wait_time = between(5, 9)
 
     def __init__(self, parent):
         super().__init__(parent)
@@ -24,16 +25,10 @@ class UserBehavior(TaskSet):
 
     def on_stop(self):
         """ on_stop is called when the TaskSet is stopping """
-        self.logout()
-
-    def logout(self):
         pass
 
+    # And tasks can then be specified/excluded using the --tags/-T and --exclude-tags/-E command line arguments.
     @task
+    @tag("tag1", "tag2")
     def setup_context(self):
         load_case_a001(self.owlvey, self.product)
-
-
-class WebsiteUser(HttpLocust):
-    task_set = UserBehavior
-    wait_time = between(5, 9)

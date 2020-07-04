@@ -1,0 +1,3 @@
+docker run --rm -p 9090:8089  localhost:47000/registry/performance -f /app/performance/test_A001_load.py
+
+docker run --rm -p 9090:8089  registry/performance -f /app/performance/test_A001_load.py
