@@ -14,3 +14,5 @@ set mytime=%time:~0,2%_%time:~3,2%_%time:~6,2%
 
 locust -H http://api.owlvey.com:48100 --csv="A001_%mydate%_%mytime%" --headless -f performance/test_A001_load.py --users 10 -r 2 --run-time 10m --stop-timeout 30  --only-summary
 
+locust -H http://api.owlvey.com:48100 --headless --loglevel WARNING -f performance/scenarios/scenario_organization_load.py --users 10 -r 2 --run-time 10s--only-summary
+

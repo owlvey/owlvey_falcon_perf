@@ -5,13 +5,11 @@ import requests
 import shutil
 from os import path
 
-from app.components.ConfigurationComponent import ConfigurationComponent
-
 
 class OwlveyGateway:
-    def __init__(self, client, configuration: ConfigurationComponent):
+    def __init__(self, client, identity_api_host):
         self.client = client
-        self.configuration = configuration
+        self.identity_api_host = identity_api_host
         self.token = None
         self.token_on = None
 
@@ -22,8 +20,7 @@ class OwlveyGateway:
             "client_id": "CF4A9ED44148438A99919FF285D8B48D",
             "client_secret": "0da45603-282a-4fa6-a20b-2d4c3f2a2127"
         }
-        response = requests.post(self.configuration.identity_api + "connect/token",
-                                 data=payload)
+        response = requests.post(self.identity_api_host + "connect/token", data=payload)
         self.token_on = datetime.datetime.now()
         self.token = response.json()
 
@@ -77,8 +74,24 @@ class OwlveyGateway:
         else:
             return {}
 
+    def __internal_delete(self, url):
+        response = self.client.delete(url, verify=False,
+                                      headers=self.__build_authorization_header())
+        if response.status_code > 299:
+            raise ValueError(str(response.status_code) + " :  " + response.text)
+        if response.text:
+            return response.json()
+        else:
+            return {}
+
     def post_organization(self, name):
         return self.__internal_post('/customers', {"name": name})
+
+    def put_organization(self, id, name):
+        return self.__internal_put('/customers/{}'.format(id), {"name": name})
+
+    def delete_organization(self, id):
+        return self.__internal_delete('/customers/{}'.format(id))
 
     def post_product(self, organization_id, product):
         return self.__internal_post('/products', {"name": product, "customerId": organization_id})
