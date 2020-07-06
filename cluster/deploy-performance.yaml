@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: owlvey-performance
-          image: localhost:48700/registry/performance:latest
+          image: owlveydevcommit/performance:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8089
@@ -92,7 +92,7 @@ spec:
 
       containers:
         - name: owlvey-performance-node
-          image: localhost:48700/registry/performance:latest
+          image: owlveydevcommit/performance:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8089
