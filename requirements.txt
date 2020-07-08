@@ -5,3 +5,4 @@ jupyter==1.0.0
 pandas==1.0.3
 numpy==1.18.2
 watermark==2.0.2
+pyzmq==19.0.1
