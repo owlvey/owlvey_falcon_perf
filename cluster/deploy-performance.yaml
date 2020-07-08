@@ -20,7 +20,7 @@ spec:
       terminationGracePeriodSeconds: 30
       containers:
         - name: owlvey-performance
-          image: localhost:48700/registry/performance:latest
+          image: owlveydevcommit/performance:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8089
