@@ -1,0 +1,46 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:    
+    tier: performance
+  name: owlvey-performance-node-deployment
+  namespace: owlvey
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      key: owlvey-performance-node-pod
+  template:
+    metadata:
+      labels:
+        key: owlvey-performance-node-pod
+    spec:      
+      terminationGracePeriodSeconds: 30
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      containers:
+        - name: owlvey-performance-node
+          image: localhost:48700/registry/performance:latest
+          imagePullPolicy: Always          
+          env:
+            - name: "LOCUST_LOCUSTFILE"
+              value: "/app/performance/scenarios/scenario_organization_load.py"
+            - name: "OWLVEY_IDENTITY"
+              value: "http://service-identity:48100/"            
+            - name: "OWLVEY_API"
+              value: "http://service-api:48100/"
+            - name: "OWLVEY_CLIENT_API"
+              value: "CF4A9ED44148438A99919FF285D8B48D"
+            - name: "OWLVEY_CLIENT_SECRET"
+              value: "0da45603-282a-4fa6-a20b-2d4c3f2a2127"        
+            - name: "LOCUST_HOST"
+              value: "http://service-api:48100"        
+            - name: "LOCUST_USERS"
+              value: "10"        
+            - name: "LOCUST_HATCH_RATE"
+              value: "5"     
+            - name: "LOCUST_MODE_WORKER"
+              value: "true"    
+            - name: "LOCUST_MASTER_NODE_HOST"
+              value: "service-performance"                            
+            

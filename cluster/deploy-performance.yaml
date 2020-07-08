@@ -15,15 +15,20 @@ spec:
       labels:
         key: owlvey-performance-pod
     spec:
+      dnsPolicy: ClusterFirst
+      restartPolicy: Always
+      terminationGracePeriodSeconds: 30
       containers:
         - name: owlvey-performance
-          image: owlveydevcommit/performance:latest
+          image: localhost:48700/registry/performance:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 8089
               name: web
             - containerPort: 5557
               name: cluster
+            - containerPort: 5558
+              name: communication
           env:
             - name: "LOCUST_LOCUSTFILE"
               value: "/app/performance/scenarios/scenario_organization_load.py"
@@ -42,9 +47,9 @@ spec:
             - name: "LOCUST_HATCH_RATE"
               value: "5"                 
             - name: "LOCUST_MODE_MASTER"
-              value: "true"    
+              value: "false"    
             - name: "LOCUST_EXPECT_WORKERS"
-              value: "1"                
+              value: "1"   
 
 ---
 apiVersion: v1
@@ -61,61 +66,12 @@ spec:
       protocol: TCP      
       port: 48100
       targetPort: 8089
-    - name: grid
+    - name: cluster
       protocol: TCP      
       port: 5557
       targetPort: 5557
+    - port: 5558
+      protocol: TCP      
+      name: communication
+      targetPort: 5558
 
----
-
-apiVersion: apps/v1
-kind: Deployment
-metadata:
-  labels:    
-    tier: performance
-  name: owlvey-performance-node-deployment
-  namespace: owlvey
-spec:
-  replicas: 1
-  selector:
-    matchLabels:
-      key: owlvey-performance-node-pod
-  template:
-    metadata:
-      labels:
-        key: owlvey-performance-node-pod
-    spec:
-      initContainers:
-      - name: init-backend
-        image: busybox                
-        command: ['sh', '-c', "until nslookup service-performance.$(cat /var/run/secrets/kubernetes.io/serviceaccount/namespace).svc.cluster.local; do echo waiting for service-performance; sleep 2; done"]
-
-      containers:
-        - name: owlvey-performance-node
-          image: owlveydevcommit/performance:latest
-          imagePullPolicy: Always
-          ports:
-            - containerPort: 8089
-          env:
-            - name: "LOCUST_LOCUSTFILE"
-              value: "/app/performance/scenarios/scenario_organization_load.py"
-            - name: "OWLVEY_IDENTITY"
-              value: "http://service-identity:48100/"            
-            - name: "OWLVEY_API"
-              value: "http://service-api:48100/"
-            - name: "OWLVEY_CLIENT_API"
-              value: "CF4A9ED44148438A99919FF285D8B48D"
-            - name: "OWLVEY_CLIENT_SECRET"
-              value: "0da45603-282a-4fa6-a20b-2d4c3f2a2127"        
-            - name: "LOCUST_HOST"
-              value: "http://service-api:48100"        
-            - name: "LOCUST_USERS"
-              value: "10"        
-            - name: "LOCUST_HATCH_RATE"
-              value: "5"     
-            - name: "LOCUST_MODE_WORKER"
-              value: "true"    
-            - name: "LOCUST_MASTER_NODE_HOST"
-              value: "service-performance"    
-            - name: "LOCUST_MASTER_NODE_PORT"
-              value: "5557"    
