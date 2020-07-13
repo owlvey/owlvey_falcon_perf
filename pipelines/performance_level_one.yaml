@@ -14,13 +14,13 @@ stages:
         workingDirectory: '$(System.DefaultWorkingDirectory)'
         targetType: 'inline'
         script: |
-          sed -i -e 's/registry/owlveydevcommit/g' ./containers/docker-compose.yaml          
+          sed -i -e 's/registry/owlveydevcommit/g' ./containers/locust/docker-compose.yaml          
     - task: DockerCompose@0
       displayName: Build 
       inputs:
         containerregistrytype: 'Container Registry'
         dockerRegistryEndpoint: 'OwlveyDevopsDocker'
-        dockerComposeFile: './containers/docker-compose.yaml'
+        dockerComposeFile: './containers/locust/docker-compose.yaml'
         action: 'Build services'        
         qualifyImageNames: true                
         additionalImageTags: 'V0.0.$(Build.BuildId)'
@@ -30,7 +30,7 @@ stages:
       inputs:
         containerregistrytype: 'Container Registry'
         dockerRegistryEndpoint: 'OwlveyDevopsDocker'
-        dockerComposeFile: './containers/docker-compose.yaml'
+        dockerComposeFile: './containers/locust/docker-compose.yaml'
         action: Push services
         qualifyImageNames: true
         includeLatestTag: true        

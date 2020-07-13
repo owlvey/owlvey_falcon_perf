@@ -1,0 +1,20 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: owlvey-api-coldstart-job
+  namespace: owlvey
+spec:
+  ttlSecondsAfterFinished: 300
+  template:
+    metadata:
+      labels:
+        key: owlvey-api-coldstart-job
+    spec:      
+      containers:
+      - name: wrk
+        image: skandyla/wrk        
+        imagePullPolicy: Always
+        command: ["wrk"]
+        args: ["-d120s", "-t50", "-c50", "http://service-api:48100/health"]
+      restartPolicy: Never
+  backoffLimit: 0 # retries

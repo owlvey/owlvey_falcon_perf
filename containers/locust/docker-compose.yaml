@@ -2,8 +2,8 @@ version: '3.8'
 services:
   service-api:
         build:
-          context: ./../.
-          dockerfile: ./containers/Dockerfile
+          context: ./../../.
+          dockerfile: ./containers/locust/Dockerfile
         image: registry/performance
   
  
